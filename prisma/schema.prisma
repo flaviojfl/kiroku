@@ -1,0 +1,79 @@
+// Schema do banco de dados do sistema Kiroku
+// Banco: PostgreSQL (conforme RNF04 do Documento de Visão)
+//
+// Mapeamento a partir do Dicionário de Dados (seção 5.1.2):
+//   - usuario  -> model Usuario
+//   - eventos  -> model Evento
+//   - local    -> model Local
+//   - imagem   -> model Midia  (armazena CAMINHO do arquivo, não BLOB,
+//                 pois a mídia agora fica em /public/uploads e inclui vídeos)
+//
+// Ajustes em relação ao documento (todos documentados no README):
+//   1) "imagem" virou "Midia" e guarda o caminho do arquivo (não BLOB),
+//      e um evento pode ter VÁRIAS mídias (galeria + vídeos).
+//   2) A tabela "data" foi incorporada como o campo dataEvento no Evento
+//      (uma tabela só para datas não agregava valor à aplicação).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  login           String   @id @db.VarChar(255)
+  email           String   @unique @map("login_email") @db.VarChar(255)
+  senha           String   @map("login_senha") @db.VarChar(255)
+  tipoUsuario     Int      @default(1) @map("tipo_usuario") // 1 = organizador, 2 = administrador
+  dataCadastro    DateTime @default(now()) @map("data_cadastro")
+  dataAtualizacao DateTime @updatedAt @map("data_atualizacao")
+  ativo           Boolean  @default(true)
+
+  eventos Evento[]
+
+  @@map("usuario")
+}
+
+model Local {
+  idLocal  Int      @id @default(autoincrement()) @map("id_local")
+  endereco String   @map("endereco") @db.VarChar(255)
+  eventos  Evento[]
+
+  @@map("local")
+}
+
+model Evento {
+  idEventos       Int      @id @default(autoincrement()) @map("id_eventos")
+  nome            String   @map("evento_nome") @db.VarChar(120)
+  descricao       String   @map("evento_descricao") @db.Text
+  participantes   Int      @default(0) @map("evento_participantes")
+  tipo            String   @default("workshop") @db.VarChar(20) // "workshop" ou "evento"
+  dataEvento      DateTime @map("data_evento") @db.Date
+  dataCriacao     DateTime @default(now()) @map("data_criacao")
+  dataAtualizacao DateTime @updatedAt @map("data_atualizacao")
+
+  localId Int?   @map("local_id")
+  local   Local? @relation(fields: [localId], references: [idLocal])
+
+  usuarioLogin String?  @map("usuario_login")
+  usuario      Usuario? @relation(fields: [usuarioLogin], references: [login])
+
+  midias Midia[]
+
+  @@map("eventos")
+}
+
+model Midia {
+  idImagem Int    @id @default(autoincrement()) @map("id_imagem")
+  url      String @db.VarChar(500) // caminho do arquivo em /public/uploads
+  tipo     String @default("imagem") @db.VarChar(10) // "imagem" ou "video"
+  ordem    Int    @default(0) // ordem de exibição na galeria
+
+  eventoId Int    @map("evento_id")
+  evento   Evento @relation(fields: [eventoId], references: [idEventos], onDelete: Cascade)
+
+  @@map("imagem")
+}

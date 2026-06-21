@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --washi: #fbecd5;
+  --sumi: #25201d;
+  --sakura: #ec6f9e;
+}
+
+html,
+body {
+  background-color: var(--washi);
+  color: var(--sumi);
+}
+
+/* Textura sutil de papel washi sobre o fundo creme */
+body {
+  background-image:
+    radial-gradient(circle at 18% 22%, rgba(236, 111, 158, 0.05) 0, transparent 40%),
+    radial-gradient(circle at 82% 78%, rgba(236, 111, 158, 0.05) 0, transparent 42%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cg fill='%2325201d' fill-opacity='0.025'%3E%3Cpath d='M0 0h30v30H0zM30 30h30v30H30z'/%3E%3C/g%3E%3C/svg%3E");
+  background-attachment: fixed;
+}
+
+/* Reveal suave no carregamento da página */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.rise {
+  animation: rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Linha decorativa pincelada */
+.brush-rule {
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--sakura) 20%,
+    var(--sakura) 80%,
+    transparent
+  );
+  border-radius: 999px;
+}
+
+/* Selo / carimbo japonês para o tipo de atividade */
+.selo {
+  font-family: var(--font-display), serif;
+}
