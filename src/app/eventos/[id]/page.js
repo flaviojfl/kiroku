@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "../../lib/prisma";
 import { formatarData } from "../../lib/format";
+import Carousel from "../../components/Carousel";
 
 export const dynamic = "force-dynamic";
 
@@ -53,20 +54,8 @@ export default async function EventoDetalhe({ params }) {
 
       {/* Galeria de mídia */}
       {evento.midias.length > 0 && (
-        <section className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {evento.midias.map((m) => (
-            <div
-              key={m.idImagem}
-              className="overflow-hidden rounded-xl2 border border-sumi/10 bg-nuvem shadow-card"
-            >
-              {m.tipo === "video" ? (
-                <video src={m.url} controls className="h-full w-full" />
-              ) : (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={m.url} alt={evento.nome} className="h-full w-full object-cover" />
-              )}
-            </div>
-          ))}
+        <section className="mt-10">
+          <Carousel items={evento.midias} />
         </section>
       )}
 
